@@ -72,22 +72,18 @@ export default class RuleWeaver {
      * Evaluates given security rules and disables appropriate fields for violated conditions
      *
      * @param {Array.<object>} securityRules security rules for current context
-     * @param {object} dom
+     * @param {Model} model
      */
-    static disableFields(securityRules, dom) {
+    static disableFields(securityRules, model) {
         securityRules.forEach(rule => {
             let declarations = [];
             Object.keys(rule.declarations).forEach(declaration => declarations.push(rule.declarations[declaration].field));
             if (!eval(rule.condition)) {
                 declarations.forEach(declaration => {
-                    let elements = dom.getElementsByName(declaration);
-                    for (let i = 0; i < elements.length; ++i) {
-                        elements[i].disabled = true;
-                    }
+                    model.attributes[declaration].readOnly = true;
                 });
             }
         });
-        return dom;
     }
 
     /**

@@ -168,7 +168,7 @@
 	    Promise.resolve(ruleAspectsSource.fetchRules(model.entityName, model.context)).then(function (rules) {
 	        var contextRules = new _ContextRules2.default(rules, model.context);
 	        _RuleWeaver2.default.addObservers(model, contextRules.validationRules(), model.locale);
-	        // toDo: handle security rules
+	        _RuleWeaver2.default.disableFields(contextRules.securityRules(), model);
 	    });
 	    if (!model.hasRules) {
 	        model['validation'].state = ValidationState.VALID;
@@ -306,12 +306,12 @@
 	         * Evaluates given security rules and disables appropriate fields for violated conditions
 	         *
 	         * @param {Array.<object>} securityRules security rules for current context
-	         * @param {object} dom
+	         * @param {Model} model
 	         */
 
 	    }, {
 	        key: "disableFields",
-	        value: function disableFields(securityRules, dom) {
+	        value: function disableFields(securityRules, model) {
 	            securityRules.forEach(function (rule) {
 	                var declarations = [];
 	                Object.keys(rule.declarations).forEach(function (declaration) {
@@ -319,14 +319,10 @@
 	                });
 	                if (!eval(rule.condition)) {
 	                    declarations.forEach(function (declaration) {
-	                        var elements = dom.getElementsByName(declaration);
-	                        for (var i = 0; i < elements.length; ++i) {
-	                            elements[i].disabled = true;
-	                        }
+	                        model.attributes[declaration].readOnly = true;
 	                    });
 	                }
 	            });
-	            return dom;
 	        }
 
 	        /**

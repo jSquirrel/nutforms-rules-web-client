@@ -57,7 +57,7 @@ export function callback(model) {
     ).then((rules) => {
         let contextRules = new ContextRules(rules, model.context);
         RuleWeaver.addObservers(model, contextRules.validationRules(), model.locale);
-        // toDo: handle security rules
+        RuleWeaver.disableFields(contextRules.securityRules(), model);
     });
     if (!model.hasRules) {
         model['validation'].state = ValidationState.VALID;
