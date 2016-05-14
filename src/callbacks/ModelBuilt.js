@@ -4,6 +4,7 @@ import ContextRules from "../rules/ContextRules";
 import Validation from "../model/Validation";
 import * as ValidationActions from "../constants/ValidationActions";
 import * as AttributeValidated from "./AttributeValidated";
+import * as ValidationState from "../constants/ValidationState";
 
 /**
  *
@@ -34,6 +35,7 @@ export function callback(model) {
         attr.hasErrors = function () {
             attr.validation.hasErrors();
         };
+        attr.listen(AttributeActions.VALUE_CHANGED, setPending)
     });
     Object.keys(model.relations).forEach((rel) => {
         let relation = model.relations[rel];
@@ -44,6 +46,7 @@ export function callback(model) {
         relation.hasErrors = function () {
             relation.validation.hasErrors();
         };
+        relation.listen(AttributeActions.VALUE_CHANGED, setPending)
     });
     let ruleAspectsSource = new RuleAspectsSource();
     Promise.resolve(
@@ -54,4 +57,13 @@ export function callback(model) {
         // toDo: handle security rules
         console.log('validation functions created', model);
     });
+}
+
+/**
+ * VALUE_CHANGED callback to set state to PENDING
+ *
+ * @param {Attribute} attribute
+ */
+function setPending(attribute) {
+    attribute['validation'].state = ValidationState.PENDING;
 }
