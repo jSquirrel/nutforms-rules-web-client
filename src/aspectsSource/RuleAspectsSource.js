@@ -35,6 +35,6 @@ export default class RuleAspectSource {
         var request = new XMLHttpRequest();
         request.open('GET', Nutforms.aspectsSource._buildUrl(this.RULES_ENDPOINT + className + '/' + context), false);
         request.send(null);
-        return request.response.status == 200 ? this._toJson(request.response) : null;
+        return request.status == 200 ? this._toJson(request.response) : null;
     }
 }
