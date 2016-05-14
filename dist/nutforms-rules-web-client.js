@@ -58,9 +58,13 @@
 
 	var ValidationState = _interopRequireWildcard(_ValidationState);
 
-	var _FormRendered = __webpack_require__(11);
+	var _FormRendered = __webpack_require__(12);
 
 	var FormRendered = _interopRequireWildcard(_FormRendered);
+
+	var _FormSubmitted = __webpack_require__(10);
+
+	var FormSubmitted = _interopRequireWildcard(_FormSubmitted);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -68,6 +72,7 @@
 	window.ValidationState = ValidationState;
 	Nutforms.listen(NutformsActions.MODEL_BUILT, ModelBuilt.callback);
 	Nutforms.listen(NutformsActions.FORM_RENDERED, FormRendered.callback);
+	Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.setPending);
 
 /***/ },
 /* 1 */
@@ -1254,16 +1259,28 @@
 	    value: true
 	});
 	exports.callback = callback;
+	exports.renderFeedback = renderFeedback;
+	exports.setPending = setPending;
 
 	var _ValidationActions = __webpack_require__(9);
 
 	var ValidationActions = _interopRequireWildcard(_ValidationActions);
 
+	var _FeedbackHelper = __webpack_require__(11);
+
+	var _FeedbackHelper2 = _interopRequireDefault(_FeedbackHelper);
+
+	var _ValidationState = __webpack_require__(4);
+
+	var ValidationState = _interopRequireWildcard(_ValidationState);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	/**
-	 * Callback for event FORM_SUBMITTED, which is responsible for triggering model related rules and firing respective
-	 * events.
+	 * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for triggering model related rules and 
+	 * firing respective events.
 	 *
 	 * @param {Model} model form rich model
 	 */
@@ -1274,76 +1291,16 @@
 	    }
 	}
 
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.callback = callback;
-
-	var _AttributeValidated = __webpack_require__(12);
-
-	var AttributeValidated = _interopRequireWildcard(_AttributeValidated);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 	/**
-	 * Callback for FORM_RENDERED event. This is used to add callback for individual attributes and model to properly
-	 * render feedback messages.
+	 * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for rendering feedback.
 	 *
-	 * @param {Model} model
-	 * @param htmlElement
+	 * @param model
+	 * @param formLabel
 	 */
-	function callback(model, htmlElement) {
-	    // render feedback when validation is finished
-	    var values = DOMHelper.findElementsWithAttribute(htmlElement, "nf-field-widget-value");
+	function renderFeedback(model, formLabel) {
+	    var messages = _FeedbackHelper2.default.createErrors(model);
 
-	    var _loop = function _loop() {
-	        var value = values[k];
-	        var attributeName = value.getAttribute("nf-field-widget-value");
-	        var attribute = model.attributes[attributeName];
-	        attribute.listen(ValidationActions.ATTRIBUTE_VALIDATED, function (attr) {
-	            AttributeValidated.callback(attr, value);
-	        });
-	    };
-
-	    for (var k = 0, o = values.length; k < o; k++) {
-	        _loop();
-	    }
-	    // toDo: add feedback to relations
-	}
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.callback = callback;
-
-	var _FeedbackHelper = __webpack_require__(13);
-
-	var _FeedbackHelper2 = _interopRequireDefault(_FeedbackHelper);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	/**
-	 * Callback for event ATTRIBUTE_VALIDATED - renders all errors and info messages for given field
-	 *
-	 * @param {Attribute} attr
-	 * @param htmlElement
-	 */
-	function callback(attr, htmlElement) {
-	    var messages = _FeedbackHelper2.default.createErrors(attr);
-
-	    var errorFields = DOMHelper.findElementsWithAttribute(htmlElement.parentElement, "nf-field-widget-errors");
+	    var errorFields = DOMHelper.findElementsWithAttribute(formLabel.parentElement, "nf-model-widget-errors");
 	    if (errorFields.length > 0) {
 	        errorFields.forEach(function (field) {
 	            // Add validation messages to each nf-field-widget-errors container
@@ -1351,12 +1308,21 @@
 	        });
 	    } else {
 	        // If there is no nf-field-widget-errors container, create one
-	        htmlElement.parentElement.insertAdjacentHTML("beforeend", "<div nf-field-widget-errors>" + messages + "</div>");
+	        formLabel.insertAdjacentHTML("afterend", "<div nf-model-widget-errors>" + messages + "</div>");
 	    }
 	}
 
+	/**
+	 * Updates model state on form submit before validation.
+	 *
+	 * @param model
+	 */
+	function setPending(model) {
+	    model['validation'].state = model.hasRules ? ValidationState.PENDING : ValidationState.VALID;
+	}
+
 /***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1407,6 +1373,99 @@
 	}();
 
 	exports.default = FeedbackHelper;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.callback = callback;
+
+	var _AttributeValidated = __webpack_require__(13);
+
+	var AttributeValidated = _interopRequireWildcard(_AttributeValidated);
+
+	var _ValidationActions = __webpack_require__(9);
+
+	var ValidationActions = _interopRequireWildcard(_ValidationActions);
+
+	var _FormSubmitted = __webpack_require__(10);
+
+	var FormSubmitted = _interopRequireWildcard(_FormSubmitted);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	/**
+	 * Callback for FORM_RENDERED event. This is used to add callback for individual attributes and model to properly
+	 * render feedback messages.
+	 *
+	 * @param {Model} model
+	 * @param htmlElement
+	 */
+	function callback(model, htmlElement) {
+	    // render feedback when validation is finished
+	    var values = DOMHelper.findElementsWithAttribute(htmlElement, "nf-field-widget-value");
+
+	    var _loop = function _loop() {
+	        var value = values[k];
+	        var attributeName = value.getAttribute("nf-field-widget-value");
+	        var attribute = model.attributes[attributeName];
+	        attribute.listen(ValidationActions.ATTRIBUTE_VALIDATED, function (attr) {
+	            return AttributeValidated.callback(attr, value);
+	        });
+	    };
+
+	    for (var k = 0, o = values.length; k < o; k++) {
+	        _loop();
+	    }
+	    var formLabel = DOMHelper.findElementsWithAttribute(htmlElement, "nf-form-label")[0];
+	    model.listen(ValidationActions.MODEL_VALIDATED, function (model) {
+	        return FormSubmitted.renderFeedback(model, formLabel);
+	    });
+	    // toDo: add feedback to relations
+	}
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.callback = callback;
+
+	var _FeedbackHelper = __webpack_require__(11);
+
+	var _FeedbackHelper2 = _interopRequireDefault(_FeedbackHelper);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * Callback for event ATTRIBUTE_VALIDATED - renders all errors and info messages for given field
+	 *
+	 * @param {Attribute} attr
+	 * @param htmlElement
+	 */
+	function callback(attr, htmlElement) {
+	    var messages = _FeedbackHelper2.default.createErrors(attr);
+
+	    var errorFields = DOMHelper.findElementsWithAttribute(htmlElement.parentElement, "nf-field-widget-errors");
+	    if (errorFields.length > 0) {
+	        errorFields.forEach(function (field) {
+	            // Add validation messages to each nf-field-widget-errors container
+	            field.innerHTML = messages;
+	        });
+	    } else {
+	        // If there is no nf-field-widget-errors container, create one
+	        htmlElement.parentElement.insertAdjacentHTML("beforeend", "<div nf-field-widget-errors>" + messages + "</div>");
+	    }
+	}
 
 /***/ }
 /******/ ]);
