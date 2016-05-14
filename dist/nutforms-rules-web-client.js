@@ -166,9 +166,11 @@
 	    });
 	    var ruleAspectsSource = new _RuleAspectsSource2.default();
 	    var rules = ruleAspectsSource.fetchRules(model.entityName, model.context);
-	    var contextRules = new _ContextRules2.default(rules, model.context);
-	    _RuleWeaver2.default.addObservers(model, contextRules.validationRules(), model.locale);
-	    _RuleWeaver2.default.disableFields(contextRules.securityRules(), model);
+	    if (rules !== null) {
+	        var contextRules = new _ContextRules2.default(rules, model.context);
+	        _RuleWeaver2.default.addObservers(model, contextRules.validationRules(), model.locale);
+	        _RuleWeaver2.default.disableFields(contextRules.securityRules(), model);
+	    }
 	    if (!model.hasRules) {
 	        model['validation'].state = ValidationState.VALID;
 	        Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.callback);
@@ -594,7 +596,7 @@
 	     *
 	     * @param {string} className
 	     * @param {string} context
-	     * @returns {string}
+	     * @returns {object}
 	     */
 
 
@@ -604,7 +606,7 @@
 	            var request = new XMLHttpRequest();
 	            request.open('GET', Nutforms.aspectsSource._buildUrl(this.RULES_ENDPOINT + className + '/' + context), false);
 	            request.send(null);
-	            return this._toJson(request.response);
+	            return request.response.status == 200 ? this._toJson(request.response) : null;
 	        }
 	    }]);
 
