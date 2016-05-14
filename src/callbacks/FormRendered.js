@@ -1,4 +1,6 @@
 import * as AttributeValidated from "./AttributeValidated";
+import * as ValidationActions from "../constants/ValidationActions";
+import * as FormSubmitted from "./FormSubmitted";
 
 /**
  * Callback for FORM_RENDERED event. This is used to add callback for individual attributes and model to properly
@@ -14,9 +16,9 @@ export function callback(model, htmlElement) {
         let value = values[k];
         let attributeName = value.getAttribute("nf-field-widget-value");
         let attribute = model.attributes[attributeName];
-        attribute.listen(ValidationActions.ATTRIBUTE_VALIDATED, (attr) => {
-            AttributeValidated.callback(attr, value);
-        });
+        attribute.listen(ValidationActions.ATTRIBUTE_VALIDATED, (attr) => AttributeValidated.callback(attr, value));
     }
+    let formLabel = DOMHelper.findElementsWithAttribute(htmlElement, "nf-form-label")[0];
+    model.listen(ValidationActions.MODEL_VALIDATED, (model) => FormSubmitted.renderFeedback(model, formLabel));
     // toDo: add feedback to relations
 }
