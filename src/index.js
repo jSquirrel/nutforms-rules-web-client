@@ -1,4 +1,3 @@
-import '../lib/nutforms'
 import * as ModelBuilt from "./callbacks/ModelBuilt";
 import * as ValidationActions from "./constants/ValidationActions";
 import * as ValidationState from "./constants/ValidationState";
