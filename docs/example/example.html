@@ -26,9 +26,29 @@
 
     // Retrieve Widget Mapping function
     // Or you can define your own
-    var mappingFunctionString = Nutforms.aspectsSource.fetchWidgetMapping();
-    var mappingFunction;
-    eval(mappingFunctionString);
+    var mappingFunction = function (attribute) {
+        var widgetNamespace = "default";
+        if (attribute.primary == true) {
+            widgetNamespace = "disabled";
+        }
+
+        var widgetName = "";
+        switch (attribute.type) {
+            case "java.lang.String":
+                widgetName = "text-input";
+                break;
+            case "java.lang.Long":
+                widgetName = "number-input";
+                break;
+            case "ToOne":
+                widgetName = "relation-to-one";
+                break;
+            case "ToMany":
+                widgetName = "relation-to-many";
+                break;
+        }
+        return widgetNamespace + "/" + widgetName;
+    };
 
     // Listen to nutforms events
     Nutforms.listen(NutformsActions.MODEL_BUILT, function() {

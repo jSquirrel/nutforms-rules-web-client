@@ -4,10 +4,8 @@ import * as ValidationActions from "../constants/ValidationActions";
  * events.
  *
  * @param {Model} model form rich model
- * @param values
  */
-export function callback(model, values) {
-    console.log("Forms submitted callback", model);
+export function callback(model) {
     if (!model.hasErrors()) {
         model.trigger(ValidationActions.MODEL_VALID, model);
         console.log("Triggered MODEL_VALID");
