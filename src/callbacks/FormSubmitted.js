@@ -1,5 +1,6 @@
 import * as ValidationActions from "../constants/ValidationActions";
 import FeedbackHelper from "../helper/FeedbackHelper";
+import * as ValidationState from "../constants/ValidationState";
 /**
  * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for triggering model related rules and 
  * firing respective events.
@@ -33,4 +34,13 @@ export function renderFeedback(model, formLabel) {
         formLabel.insertAdjacentHTML("afterend", "<div nf-model-widget-errors>"
             + messages + "</div>");
     }
+}
+
+/**
+ * Updates model state on form submit before validation.
+ *
+ * @param model
+ */
+export function setPending(model) {
+    model['validation'].state = model.hasRules ? ValidationState.PENDING : ValidationState.VALID;
 }
