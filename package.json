@@ -27,6 +27,7 @@
     "webpack": "^1.13.0"
   },
   "dependencies": {
+    "nutforms-web-client": "^1.1.0",
     "whatwg-fetch": "^1.0.0"
   }
 }
