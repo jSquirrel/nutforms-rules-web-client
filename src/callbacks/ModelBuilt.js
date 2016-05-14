@@ -3,8 +3,8 @@ import RuleAspectsSource from "../aspectsSource/RuleAspectsSource";
 import ContextRules from "../rules/ContextRules";
 import Validation from "../model/Validation";
 import * as ValidationActions from "../constants/ValidationActions";
-import * as AttributeValidated from "./AttributeValidated";
 import * as ValidationState from "../constants/ValidationState";
+import * as FormSubmitted from "./FormSubmitted";
 
 /**
  *
@@ -26,6 +26,7 @@ export function callback(model) {
         errors |= model.validation.hasErrors();  // toDo: probably also add state
         return errors;
     };
+    model.listen(ValidationActions.MODEL_VALIDATED, FormSubmitted.callback);
     Object.keys(model.attributes).forEach((attribute) => {
         let attr = model.attributes[attribute];
         attr.validation = new Validation().bind(attr);
@@ -65,5 +66,6 @@ export function callback(model) {
  * @param {Attribute} attribute
  */
 function setPending(attribute) {
-    attribute['validation'].state = ValidationState.PENDING;
+    attribute['validation'].state = attribute.hasObserver(AttributeActions.VALUE_CHANGED) ?
+        ValidationState.PENDING : ValidationState.VALID;
 }
