@@ -21,8 +21,8 @@ export function callback(model) {
     };
     model.hasErrors = function () {
         let errors = false;
-        Object.keys(model.attributes).forEach((attr) => errors |= model.attributes[attr].hasErrors());
-        //Object.keys(model.relations).forEach((relation) => errors |= model.getRelation(relation).hasErrors());
+        Object.keys(model.attributes).forEach((attr) => errors |= model.attributes[attr]['validation'].hasErrors());
+        //Object.keys(model.relations).forEach((relation) => errors |= model.relations[relation]['validation'].hasErrors());
         errors |= model.validation.hasErrors();  // toDo: probably also add state
         return errors;
     };
@@ -60,6 +60,7 @@ export function callback(model) {
         // toDo: handle security rules
     });
     if (!model.hasRules) {
+        model['validation'].state = ValidationState.VALID;
         Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.callback)
     }
 }
