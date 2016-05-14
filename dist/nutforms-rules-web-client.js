@@ -165,11 +165,10 @@
 	        relation.listen(AttributeActions.VALUE_CHANGED, setPending);
 	    });
 	    var ruleAspectsSource = new _RuleAspectsSource2.default();
-	    Promise.resolve(ruleAspectsSource.fetchRules(model.entityName, model.context)).then(function (rules) {
-	        var contextRules = new _ContextRules2.default(rules, model.context);
-	        _RuleWeaver2.default.addObservers(model, contextRules.validationRules(), model.locale);
-	        _RuleWeaver2.default.disableFields(contextRules.securityRules(), model);
-	    });
+	    var rules = ruleAspectsSource.fetchRules(model.entityName, model.context);
+	    var contextRules = new _ContextRules2.default(rules, model.context);
+	    _RuleWeaver2.default.addObservers(model, contextRules.validationRules(), model.locale);
+	    _RuleWeaver2.default.disableFields(contextRules.securityRules(), model);
 	    if (!model.hasRules) {
 	        model['validation'].state = ValidationState.VALID;
 	        Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.callback);
@@ -595,14 +594,20 @@
 	     *
 	     * @param {string} className
 	     * @param {string} context
-	     * @returns {Promise.<T>}
+	     * @returns {string}
 	     */
 
 
 	    _createClass(RuleAspectSource, [{
 	        key: 'fetchRules',
 	        value: function fetchRules(className, context) {
-	            return fetch(Nutforms.aspectsSource._buildUrl(this.RULES_ENDPOINT + className + '/' + context)).then(this._toJson).then(this._logResponse("Context rules loaded from API"));
+	            // return fetch(Nutforms.aspectsSource._buildUrl(this.RULES_ENDPOINT + className + '/' + context))
+	            //     .then(this._toJson)
+	            //     .then(this._logResponse("Context rules loaded from API"));
+	            var request = new XMLHttpRequest();
+	            request.open('GET', this._buildUrl(this.RULES_ENDPOINT + className + '/' + context), false); // `false` makes the request synchronous
+	            request.send(null);
+	            return request.responseText;
 	        }
 	    }]);
 

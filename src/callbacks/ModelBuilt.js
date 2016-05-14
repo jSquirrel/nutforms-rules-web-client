@@ -52,13 +52,10 @@ export function callback(model) {
         relation.listen(AttributeActions.VALUE_CHANGED, setPending)
     });
     let ruleAspectsSource = new RuleAspectsSource();
-    Promise.resolve(
-        ruleAspectsSource.fetchRules(model.entityName, model.context)
-    ).then((rules) => {
-        let contextRules = new ContextRules(rules, model.context);
-        RuleWeaver.addObservers(model, contextRules.validationRules(), model.locale);
-        RuleWeaver.disableFields(contextRules.securityRules(), model);
-    });
+    let rules = ruleAspectsSource.fetchRules(model.entityName, model.context)
+    let contextRules = new ContextRules(rules, model.context);
+    RuleWeaver.addObservers(model, contextRules.validationRules(), model.locale);
+    RuleWeaver.disableFields(contextRules.securityRules(), model);
     if (!model.hasRules) {
         model['validation'].state = ValidationState.VALID;
         Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.callback)

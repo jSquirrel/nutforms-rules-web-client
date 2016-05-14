@@ -29,11 +29,15 @@ export default class RuleAspectSource {
      *
      * @param {string} className
      * @param {string} context
-     * @returns {Promise.<T>}
+     * @returns {string}
      */
     fetchRules(className, context) {
-        return fetch(Nutforms.aspectsSource._buildUrl(this.RULES_ENDPOINT + className + '/' + context))
-            .then(this._toJson)
-            .then(this._logResponse("Context rules loaded from API"));
+        // return fetch(Nutforms.aspectsSource._buildUrl(this.RULES_ENDPOINT + className + '/' + context))
+        //     .then(this._toJson)
+        //     .then(this._logResponse("Context rules loaded from API"));
+        var request = new XMLHttpRequest();
+        request.open('GET', this._buildUrl(this.RULES_ENDPOINT + className + '/' + context), false);  // `false` makes the request synchronous
+        request.send(null);
+        return request.responseText;
     }
 }
