@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head><title>Nutforms Web Client</title></head>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<body>
+<div class="container">
+    <h1>Nutforms Web Client</h1>
+    <div id="form"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.2.3.min.js"
+        integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+        integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+        crossorigin="anonymous"></script>
+<script src="../../dist/nutforms-rules-web-client.js"></script>
+<script type="text/javascript">
+    // Set nutforms aspects source
+    Nutforms.setAspectsSource(new NutformsApiAspectsSource(
+            "https://nutforms.herokuapp.com/",      // Api URL
+            "admin",                                // Api user
+            "1234")                                 // Api user's password
+    );
+
+    // Retrieve Widget Mapping function
+    // Or you can define your own
+    var mappingFunctionString = Nutforms.aspectsSource.fetchWidgetMapping();
+    var mappingFunction;
+    eval(mappingFunctionString);
+
+    // Listen to nutforms events
+    Nutforms.listen(NutformsActions.MODEL_BUILT, function() {
+        console.log('Model built');
+    });
+    Nutforms.listen(NutformsActions.FORM_SUBMITTED, function (model, values) {
+        console.log("Form submitted", model, values);
+        // Send the values here via POST/PUT request
+        // and redirect, or display validation errors
+    });
+
+    // Generate the form
+    nutforms = Nutforms.generateForm(
+            document.getElementById("form"),                // HTML Element
+            "cz.cvut.fel.nutforms.example.model.Bug",       // Entity name
+            "cz_CS",                                        // Locale
+            1,                                              // Entity id
+            "cz.cvut.fel.nutforms.example.model.Bug/new",   // Layout name
+            mappingFunction,                                // Mapping function
+            "new"                                           // Business context
+    );
+</script>
+</body>
+</html>
