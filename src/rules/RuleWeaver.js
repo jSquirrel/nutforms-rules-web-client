@@ -27,8 +27,12 @@ export default class RuleWeaver {
                     // toDo: also add validators to Relations
                     if (isModelRelated) {
                         model.listen(ModelActions.SUBMITTED, validator);
+                        model.hasRules = true;
                     } else {
-                        attributes.forEach(attribute => attribute.listen(AttributeActions.VALUE_CHANGED, validator));
+                        attributes.forEach(attribute => {
+                            attribute.listen(AttributeActions.VALUE_CHANGED, validator);
+                            attribute.hasRules = true;
+                        });
                     }
                 }
             }

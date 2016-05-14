@@ -26,6 +26,7 @@ export function callback(model) {
         errors |= model.validation.hasErrors();  // toDo: probably also add state
         return errors;
     };
+    model.hasRules = false;
     model.listen(ValidationActions.MODEL_VALIDATED, FormSubmitted.callback);
     Object.keys(model.attributes).forEach((attribute) => {
         let attr = model.attributes[attribute];
@@ -36,6 +37,7 @@ export function callback(model) {
         attr.hasErrors = function () {
             attr.validation.hasErrors();
         };
+        attr.hasRules = false;
         attr.listen(AttributeActions.VALUE_CHANGED, setPending)
     });
     Object.keys(model.relations).forEach((rel) => {
@@ -56,8 +58,10 @@ export function callback(model) {
         let contextRules = new ContextRules(rules, model.context);
         RuleWeaver.addObservers(model, contextRules.validationRules(), model.locale);
         // toDo: handle security rules
-        console.log('validation functions created', model);
     });
+    if (!model.hasRules) {
+        Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.callback)
+    }
 }
 
 /**
@@ -66,6 +70,6 @@ export function callback(model) {
  * @param {Attribute} attribute
  */
 function setPending(attribute) {
-    attribute['validation'].state = attribute.hasObserver(AttributeActions.VALUE_CHANGED) ?
+    attribute['validation'].state = attribute.hasRules ?
         ValidationState.PENDING : ValidationState.VALID;
 }
