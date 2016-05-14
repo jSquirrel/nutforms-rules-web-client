@@ -10,7 +10,7 @@ export default class RuleAspectSource {
         this._toText = response => response.text();
         this._toJson = response => {
             try {
-                return response.json();
+                return JSON.parse(response);
             } catch (err) {
                 console.log("Error while parsing JSON", response);
                 return null;
@@ -32,13 +32,9 @@ export default class RuleAspectSource {
      * @returns {string}
      */
     fetchRules(className, context) {
-        // return fetch(Nutforms.aspectsSource._buildUrl(this.RULES_ENDPOINT + className + '/' + context))
-        //     .then(this._toJson)
-        //     .then(this._logResponse("Context rules loaded from API"));
-        // toDo: ajax
         var request = new XMLHttpRequest();
         request.open('GET', Nutforms.aspectsSource._buildUrl(this.RULES_ENDPOINT + className + '/' + context), false);
         request.send(null);
-        return request.responseText;
+        return this._toJson(request.response);
     }
 }
