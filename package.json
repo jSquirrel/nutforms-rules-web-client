@@ -1,6 +1,6 @@
 {
   "name": "nutforms-rules-web-client",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Nutforms Rules module for client side",
   "main": "src/index.js",
   "scripts": {
