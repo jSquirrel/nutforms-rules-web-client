@@ -1354,7 +1354,7 @@
 	            var infos = []; // "<div class=\"validation-error\">" + observable.state + "</div>"
 	            for (var info in observable.validation.info) {
 	                if (observable.validation.info.hasOwnProperty(info)) {
-	                    infos.push("<div class=\"validation-error\">" + observable.validation.info[info] + "</div>");
+	                    infos.push("<div class=\"validation-info\">" + observable.validation.info[info] + "</div>");
 	                }
 	            }
 
