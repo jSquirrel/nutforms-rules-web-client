@@ -58,7 +58,7 @@
 
 	var ValidationState = _interopRequireWildcard(_ValidationState);
 
-	var _FormRendered = __webpack_require__(14);
+	var _FormRendered = __webpack_require__(13);
 
 	var FormRendered = _interopRequireWildcard(_FormRendered);
 
@@ -1235,11 +1235,7 @@
 
 	var _ValidationActions2 = _interopRequireDefault(_ValidationActions);
 
-	var _AttributeActions = __webpack_require__(12);
-
-	var _AttributeActions2 = _interopRequireDefault(_AttributeActions);
-
-	var _Validation = __webpack_require__(13);
+	var _Validation = __webpack_require__(12);
 
 	var _Validation2 = _interopRequireDefault(_Validation);
 
@@ -1298,7 +1294,7 @@
 	                    attr.validation.hasErrors();
 	                };
 	                attr.hasRules = false;
-	                attr.listen(_AttributeActions2.default.VALUE_CHANGED, ValidationHelper.setPending);
+	                attr.listen(AttributeActions.VALUE_CHANGED, ValidationHelper.setPending);
 	            });
 	            Object.keys(model.relations).forEach(function (rel) {
 	                var relation = model.relations[rel];
@@ -1309,7 +1305,7 @@
 	                relation.hasErrors = function () {
 	                    relation.validation.hasErrors();
 	                };
-	                relation.listen(_AttributeActions2.default.VALUE_CHANGED, ValidationHelper.setPending);
+	                relation.listen(AttributeActions.VALUE_CHANGED, ValidationHelper.setPending);
 	            });
 	        }
 
@@ -1333,13 +1329,6 @@
 
 /***/ },
 /* 12 */
-/***/ function(module, exports) {
-
-	export const VALUE_CHANGED = 'value-changed';
-
-
-/***/ },
-/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1445,7 +1434,7 @@
 	exports.default = Validation;
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1455,7 +1444,7 @@
 	});
 	exports.callback = callback;
 
-	var _AttributeValidated = __webpack_require__(15);
+	var _AttributeValidated = __webpack_require__(14);
 
 	var AttributeValidated = _interopRequireWildcard(_AttributeValidated);
 
@@ -1500,7 +1489,7 @@
 	}
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
