@@ -58,21 +58,25 @@
 
 	var ValidationState = _interopRequireWildcard(_ValidationState);
 
-	var _FormRendered = __webpack_require__(12);
+	var _FormRendered = __webpack_require__(14);
 
 	var FormRendered = _interopRequireWildcard(_FormRendered);
 
-	var _FormSubmitted = __webpack_require__(10);
+	var _FormSubmitted = __webpack_require__(8);
 
 	var FormSubmitted = _interopRequireWildcard(_FormSubmitted);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	window.ValidationActions = ValidationActions;
-	window.ValidationState = ValidationState;
-	Nutforms.listen(NutformsActions.MODEL_BUILT, ModelBuilt.callback);
-	Nutforms.listen(NutformsActions.FORM_RENDERED, FormRendered.callback);
-	Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.setPending);
+	if (typeof Nutforms === 'undefined') {
+	    console.error('Nutforms must be included in order to use this library.');
+	} else {
+	    window.ValidationActions = ValidationActions;
+	    window.ValidationState = ValidationState;
+	    Nutforms.listen(NutformsActions.MODEL_BUILT, ModelBuilt.callback);
+	    Nutforms.listen(NutformsActions.FORM_RENDERED, FormRendered.callback);
+	    Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.setPending);
+	}
 
 /***/ },
 /* 1 */
@@ -97,21 +101,17 @@
 
 	var _ContextRules2 = _interopRequireDefault(_ContextRules);
 
-	var _Validation = __webpack_require__(8);
-
-	var _Validation2 = _interopRequireDefault(_Validation);
-
-	var _ValidationActions = __webpack_require__(9);
-
-	var ValidationActions = _interopRequireWildcard(_ValidationActions);
-
 	var _ValidationState = __webpack_require__(4);
 
 	var ValidationState = _interopRequireWildcard(_ValidationState);
 
-	var _FormSubmitted = __webpack_require__(10);
+	var _FormSubmitted = __webpack_require__(8);
 
 	var FormSubmitted = _interopRequireWildcard(_FormSubmitted);
+
+	var _ValidationHelper = __webpack_require__(11);
+
+	var ValidationHelper = _interopRequireWildcard(_ValidationHelper);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -125,45 +125,7 @@
 	 * @param {Model} model
 	 */
 	function callback(model) {
-	    // create validation objects
-	    model.validation = new _Validation2.default().bind(model);
-	    model.validated = function () {
-	        model.trigger(ValidationActions.MODEL_VALIDATED, model);
-	    };
-	    model.hasErrors = function () {
-	        var errors = false;
-	        Object.keys(model.attributes).forEach(function (attr) {
-	            return errors |= model.attributes[attr]['validation'].hasErrors();
-	        });
-	        //Object.keys(model.relations).forEach((relation) => errors |= model.relations[relation]['validation'].hasErrors());
-	        errors |= model.validation.hasErrors(); // toDo: probably also add state
-	        return errors;
-	    };
-	    model.hasRules = false;
-	    model.listen(ValidationActions.MODEL_VALIDATED, FormSubmitted.callback);
-	    Object.keys(model.attributes).forEach(function (attribute) {
-	        var attr = model.attributes[attribute];
-	        attr.validation = new _Validation2.default().bind(attr);
-	        attr.validated = function () {
-	            attr.trigger(ValidationActions.ATTRIBUTE_VALIDATED, attr);
-	        };
-	        attr.hasErrors = function () {
-	            attr.validation.hasErrors();
-	        };
-	        attr.hasRules = false;
-	        attr.listen(AttributeActions.VALUE_CHANGED, setPending);
-	    });
-	    Object.keys(model.relations).forEach(function (rel) {
-	        var relation = model.relations[rel];
-	        relation.validation = new _Validation2.default().bind(relation);
-	        relation.validated = function () {
-	            relation.trigger(ValidationActions.ATTRIBUTE_VALIDATED, relation);
-	        };
-	        relation.hasErrors = function () {
-	            relation.validation.hasErrors();
-	        };
-	        relation.listen(AttributeActions.VALUE_CHANGED, setPending);
-	    });
+	    ValidationHelper.enhanceModel(model);
 	    var ruleAspectsSource = new _RuleAspectsSource2.default();
 	    var rules = ruleAspectsSource.fetchRules(model.entityName, model.context);
 	    if (rules !== null) {
@@ -175,15 +137,6 @@
 	        model['validation'].state = ValidationState.VALID;
 	        Nutforms.listen(NutformsActions.FORM_SUBMITTED, FormSubmitted.callback);
 	    }
-	}
-
-	/**
-	 * VALUE_CHANGED callback to set state to PENDING
-	 *
-	 * @param {Attribute} attribute
-	 */
-	function setPending(attribute) {
-	    attribute['validation'].state = attribute.hasRules ? ValidationState.PENDING : ValidationState.VALID;
 	}
 
 /***/ },
@@ -289,7 +242,6 @@
 	                console.log(declaration + that.rewriteCondition(rule.condition));
 	                var evalResult = eval(declaration + that.rewriteCondition(rule.condition));
 	                that.updateAttributeStatus(args, observables, !!evalResult);
-	                var url = document.location.origin + '/';
 	                Nutforms.aspectsSource.fetchLocalizationData("rule." + model.entityName, locale, model.context).then(function (data) {
 	                    observables.forEach(function (observable) {
 	                        return observable.validation.update({
@@ -1136,6 +1088,265 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.callback = callback;
+	exports.renderFeedback = renderFeedback;
+	exports.setPending = setPending;
+
+	var _ValidationActions = __webpack_require__(9);
+
+	var ValidationActions = _interopRequireWildcard(_ValidationActions);
+
+	var _FeedbackHelper = __webpack_require__(10);
+
+	var _FeedbackHelper2 = _interopRequireDefault(_FeedbackHelper);
+
+	var _ValidationState = __webpack_require__(4);
+
+	var ValidationState = _interopRequireWildcard(_ValidationState);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	/**
+	 * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for triggering model related rules and 
+	 * firing respective events.
+	 *
+	 * @param {Model} model form rich model
+	 */
+	function callback(model) {
+	    if (!model.hasErrors()) {
+	        model.trigger(ValidationActions.MODEL_VALID, model);
+	    }
+	}
+
+	/**
+	 * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for rendering feedback.
+	 *
+	 * @param model
+	 * @param formLabel
+	 */
+	function renderFeedback(model, formLabel) {
+	    var messages = _FeedbackHelper2.default.createErrors(model);
+
+	    var errorFields = DOMHelper.findElementsWithAttribute(formLabel.parentElement, "nf-model-widget-errors");
+	    if (errorFields.length > 0) {
+	        errorFields.forEach(function (field) {
+	            // Add validation messages to each nf-field-widget-errors container
+	            field.innerHTML = messages;
+	        });
+	    } else {
+	        // If there is no nf-field-widget-errors container, create one
+	        formLabel.insertAdjacentHTML("afterend", "<div nf-model-widget-errors>" + messages + "</div>");
+	    }
+	}
+
+	/**
+	 * Updates model state on form submit before validation.
+	 *
+	 * @param model
+	 */
+	function setPending(model) {
+	    model['validation'].state = model.hasRules ? ValidationState.PENDING : ValidationState.VALID;
+	}
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/**
+	 * Created by Ondřej Kratochvíl on 14.5.16.
+	 */
+	var ATTRIBUTE_VALIDATED = exports.ATTRIBUTE_VALIDATED = 'attribute-validated';
+	var MODEL_VALIDATED = exports.MODEL_VALIDATED = 'model-validated';
+	var MODEL_VALID = exports.MODEL_VALID = 'model-valid';
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var FeedbackHelper = function () {
+	    function FeedbackHelper() {
+	        _classCallCheck(this, FeedbackHelper);
+	    }
+
+	    _createClass(FeedbackHelper, null, [{
+	        key: "createErrors",
+
+
+	        /**
+	         * Creates HTML elements containing error messages to the given Observable object.
+	         *
+	         * @param {Observable} observable object to which the messages will be related (Model/Attribute)
+	         * @returns {string} list of HTML elements with errors
+	         */
+	        value: function createErrors(observable) {
+	            var infos = []; // "<div class=\"validation-error\">" + observable.state + "</div>"
+	            for (var info in observable.validation.info) {
+	                if (observable.validation.info.hasOwnProperty(info)) {
+	                    infos.push("<div class=\"validation-info\">" + observable.validation.info[info] + "</div>");
+	                }
+	            }
+
+	            var errors = [];
+	            for (var error in observable.validation.errors) {
+	                if (observable.validation.errors.hasOwnProperty(error)) {
+	                    infos.push("<div class=\"validation-error\">" + observable.validation.errors[error] + "</div>");
+	                }
+	            }
+
+	            return infos.join("\n") + errors.join("\n");
+	        }
+	    }]);
+
+	    return FeedbackHelper;
+	}();
+
+	exports.default = FeedbackHelper;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _ValidationActions = __webpack_require__(9);
+
+	var _ValidationActions2 = _interopRequireDefault(_ValidationActions);
+
+	var _AttributeActions = __webpack_require__(12);
+
+	var _AttributeActions2 = _interopRequireDefault(_AttributeActions);
+
+	var _Validation = __webpack_require__(13);
+
+	var _Validation2 = _interopRequireDefault(_Validation);
+
+	var _FormSubmitted = __webpack_require__(8);
+
+	var FormSubmitted = _interopRequireWildcard(_FormSubmitted);
+
+	var _ValidationState = __webpack_require__(4);
+
+	var ValidationState = _interopRequireWildcard(_ValidationState);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var ValidationHelper = function () {
+	    function ValidationHelper() {
+	        _classCallCheck(this, ValidationHelper);
+	    }
+
+	    _createClass(ValidationHelper, [{
+	        key: "enhanceModel",
+
+
+	        /**
+	         * Adds validation functionality to given model
+	         *
+	         * @param {Model} model
+	         */
+	        value: function enhanceModel(model) {
+	            // create validation objects
+	            model.validation = new _Validation2.default().bind(model);
+	            model.validated = function () {
+	                model.trigger(_ValidationActions2.default.MODEL_VALIDATED, model);
+	            };
+	            model.hasErrors = function () {
+	                var errors = false;
+	                Object.keys(model.attributes).forEach(function (attr) {
+	                    return errors |= model.attributes[attr]['validation'].hasErrors();
+	                });
+	                //Object.keys(model.relations).forEach((relation) => errors |= model.relations[relation]['validation'].hasErrors());
+	                errors |= model.validation.hasErrors();
+	                return errors;
+	            };
+	            model.hasRules = false;
+	            model.listen(_ValidationActions2.default.MODEL_VALIDATED, FormSubmitted.callback);
+	            Object.keys(model.attributes).forEach(function (attribute) {
+	                var attr = model.attributes[attribute];
+	                attr.validation = new _Validation2.default().bind(attr);
+	                attr.validated = function () {
+	                    attr.trigger(_ValidationActions2.default.ATTRIBUTE_VALIDATED, attr);
+	                };
+	                attr.hasErrors = function () {
+	                    attr.validation.hasErrors();
+	                };
+	                attr.hasRules = false;
+	                attr.listen(_AttributeActions2.default.VALUE_CHANGED, ValidationHelper.setPending);
+	            });
+	            Object.keys(model.relations).forEach(function (rel) {
+	                var relation = model.relations[rel];
+	                relation.validation = new _Validation2.default().bind(relation);
+	                relation.validated = function () {
+	                    relation.trigger(_ValidationActions2.default.ATTRIBUTE_VALIDATED, relation);
+	                };
+	                relation.hasErrors = function () {
+	                    relation.validation.hasErrors();
+	                };
+	                relation.listen(_AttributeActions2.default.VALUE_CHANGED, ValidationHelper.setPending);
+	            });
+	        }
+
+	        /**
+	         * VALUE_CHANGED callback to set state to PENDING
+	         *
+	         * @param {Attribute} attribute
+	         */
+
+	    }], [{
+	        key: "setPending",
+	        value: function setPending(attribute) {
+	            attribute['validation'].state = attribute.hasRules ? ValidationState.PENDING : ValidationState.VALID;
+	        }
+	    }]);
+
+	    return ValidationHelper;
+	}();
+
+	exports.default = ValidationHelper;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	export const VALUE_CHANGED = 'value-changed';
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1234,148 +1445,7 @@
 	exports.default = Validation;
 
 /***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/**
-	 * Created by Ondřej Kratochvíl on 14.5.16.
-	 */
-	var ATTRIBUTE_VALIDATED = exports.ATTRIBUTE_VALIDATED = 'attribute-validated';
-	var MODEL_VALIDATED = exports.MODEL_VALIDATED = 'model-validated';
-	var MODEL_VALID = exports.MODEL_VALID = 'model-valid';
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.callback = callback;
-	exports.renderFeedback = renderFeedback;
-	exports.setPending = setPending;
-
-	var _ValidationActions = __webpack_require__(9);
-
-	var ValidationActions = _interopRequireWildcard(_ValidationActions);
-
-	var _FeedbackHelper = __webpack_require__(11);
-
-	var _FeedbackHelper2 = _interopRequireDefault(_FeedbackHelper);
-
-	var _ValidationState = __webpack_require__(4);
-
-	var ValidationState = _interopRequireWildcard(_ValidationState);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	/**
-	 * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for triggering model related rules and 
-	 * firing respective events.
-	 *
-	 * @param {Model} model form rich model
-	 */
-	function callback(model) {
-	    if (!model.hasErrors()) {
-	        model.trigger(ValidationActions.MODEL_VALID, model);
-	        console.log("Triggered MODEL_VALID");
-	    }
-	}
-
-	/**
-	 * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for rendering feedback.
-	 *
-	 * @param model
-	 * @param formLabel
-	 */
-	function renderFeedback(model, formLabel) {
-	    var messages = _FeedbackHelper2.default.createErrors(model);
-
-	    var errorFields = DOMHelper.findElementsWithAttribute(formLabel.parentElement, "nf-model-widget-errors");
-	    if (errorFields.length > 0) {
-	        errorFields.forEach(function (field) {
-	            // Add validation messages to each nf-field-widget-errors container
-	            field.innerHTML = messages;
-	        });
-	    } else {
-	        // If there is no nf-field-widget-errors container, create one
-	        formLabel.insertAdjacentHTML("afterend", "<div nf-model-widget-errors>" + messages + "</div>");
-	    }
-	}
-
-	/**
-	 * Updates model state on form submit before validation.
-	 *
-	 * @param model
-	 */
-	function setPending(model) {
-	    model['validation'].state = model.hasRules ? ValidationState.PENDING : ValidationState.VALID;
-	}
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var FeedbackHelper = function () {
-	    function FeedbackHelper() {
-	        _classCallCheck(this, FeedbackHelper);
-	    }
-
-	    _createClass(FeedbackHelper, null, [{
-	        key: "createErrors",
-
-
-	        /**
-	         * Creates HTML elements containing error messages to the given Observable object.
-	         *
-	         * @param {Observable} observable object to which the messages will be related (Model/Attribute)
-	         * @returns {string} list of HTML elements with errors
-	         */
-	        value: function createErrors(observable) {
-	            var infos = []; // "<div class=\"validation-error\">" + observable.state + "</div>"
-	            for (var info in observable.validation.info) {
-	                if (observable.validation.info.hasOwnProperty(info)) {
-	                    infos.push("<div class=\"validation-info\">" + observable.validation.info[info] + "</div>");
-	                }
-	            }
-
-	            var errors = [];
-	            for (var error in observable.validation.errors) {
-	                if (observable.validation.errors.hasOwnProperty(error)) {
-	                    infos.push("<div class=\"validation-error\">" + observable.validation.errors[error] + "</div>");
-	                }
-	            }
-
-	            return infos.join("\n") + errors.join("\n");
-	        }
-	    }]);
-
-	    return FeedbackHelper;
-	}();
-
-	exports.default = FeedbackHelper;
-
-/***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1385,7 +1455,7 @@
 	});
 	exports.callback = callback;
 
-	var _AttributeValidated = __webpack_require__(13);
+	var _AttributeValidated = __webpack_require__(15);
 
 	var AttributeValidated = _interopRequireWildcard(_AttributeValidated);
 
@@ -1393,7 +1463,7 @@
 
 	var ValidationActions = _interopRequireWildcard(_ValidationActions);
 
-	var _FormSubmitted = __webpack_require__(10);
+	var _FormSubmitted = __webpack_require__(8);
 
 	var FormSubmitted = _interopRequireWildcard(_FormSubmitted);
 
@@ -1430,7 +1500,7 @@
 	}
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1440,7 +1510,7 @@
 	});
 	exports.callback = callback;
 
-	var _FeedbackHelper = __webpack_require__(11);
+	var _FeedbackHelper = __webpack_require__(10);
 
 	var _FeedbackHelper2 = _interopRequireDefault(_FeedbackHelper);
 

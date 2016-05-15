@@ -56,7 +56,6 @@ export default class RuleWeaver {
             console.log(declaration + that.rewriteCondition(rule.condition));
             var evalResult = eval(declaration + that.rewriteCondition(rule.condition));
             that.updateAttributeStatus(args, observables, !!evalResult);
-            let url = document.location.origin + '/';
             Nutforms.aspectsSource.fetchLocalizationData(`rule.${model.entityName}`, locale, model.context).then((data) => {
                 observables.forEach(observable => observable.validation.update({
                     rule: rule.name,

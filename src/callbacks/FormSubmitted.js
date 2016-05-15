@@ -10,7 +10,6 @@ import * as ValidationState from "../constants/ValidationState";
 export function callback(model) {
     if (!model.hasErrors()) {
         model.trigger(ValidationActions.MODEL_VALID, model);
-        console.log("Triggered MODEL_VALID");
     }
 }
 

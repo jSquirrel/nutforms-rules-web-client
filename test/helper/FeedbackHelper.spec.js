@@ -1,7 +1,6 @@
 "use strict";
 import FeedbackHelper from '../../src/helper/FeedbackHelper'
 
-Object.assign = require('object-assign');
 let chai = require('chai'),
     expect = require('chai').expect,
     assert = require('chai').assert;
@@ -29,10 +28,17 @@ describe('FeedbackHelper', function () {
             let messages = FeedbackHelper.createErrors(new ObservableMock());
             messages.should.not.be.empty;
             messages.should.equal(
+                '<div class="validation-info">info1</div>\n' +
                 '<div class="validation-error">err1</div>\n' +
-                '<div class="validation-error">err2</div>\n' +
-                '<div class="validation-info">info1</div>'
+                '<div class="validation-error">err2</div>'
             );
         });
+        it('should return empty string for objects without feedback', function() {
+            let mock = new ObservableMock();
+            mock.validation.errors = null;
+            mock.validation.info = null;
+            let messages = FeedbackHelper.createErrors(mock);
+            messages.should.be.empty;
+        })
     });
 });

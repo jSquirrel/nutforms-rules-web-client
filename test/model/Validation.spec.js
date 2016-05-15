@@ -1,6 +1,7 @@
 "use strict";
 import Validation from '../../src/model/Validation'
 import * as ValidationState from '../../src/constants/ValidationState'
+import ListenerMock from '../ListenerMock'
 
 Object.assign = require('object-assign');
 let chai = require('chai'),

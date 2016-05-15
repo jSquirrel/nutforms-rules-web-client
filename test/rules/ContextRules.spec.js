@@ -1,7 +1,6 @@
 "use strict";
 import ContextRules from '../../src/rules/ContextRules'
 
-Object.assign = require('object-assign');
 let chai = require('chai'),
     expect = require('chai').expect,
     assert = require('chai').assert;
