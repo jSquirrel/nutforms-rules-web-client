@@ -1231,10 +1231,6 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _ValidationActions = __webpack_require__(9);
-
-	var _ValidationActions2 = _interopRequireDefault(_ValidationActions);
-
 	var _Validation = __webpack_require__(12);
 
 	var _Validation2 = _interopRequireDefault(_Validation);
@@ -1246,6 +1242,10 @@
 	var _ValidationState = __webpack_require__(4);
 
 	var ValidationState = _interopRequireWildcard(_ValidationState);
+
+	var _ValidationActions = __webpack_require__(9);
+
+	var ValidationActions = _interopRequireWildcard(_ValidationActions);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -1271,7 +1271,7 @@
 	            // create validation objects
 	            model.validation = new _Validation2.default().bind(model);
 	            model.validated = function () {
-	                model.trigger(_ValidationActions2.default.MODEL_VALIDATED, model);
+	                model.trigger(ValidationActions.MODEL_VALIDATED, model);
 	            };
 	            model.hasErrors = function () {
 	                var errors = false;
@@ -1283,12 +1283,12 @@
 	                return errors;
 	            };
 	            model.hasRules = false;
-	            model.listen(_ValidationActions2.default.MODEL_VALIDATED, FormSubmitted.callback);
+	            model.listen(ValidationActions.MODEL_VALIDATED, FormSubmitted.callback);
 	            Object.keys(model.attributes).forEach(function (attribute) {
 	                var attr = model.attributes[attribute];
 	                attr.validation = new _Validation2.default().bind(attr);
 	                attr.validated = function () {
-	                    attr.trigger(_ValidationActions2.default.ATTRIBUTE_VALIDATED, attr);
+	                    attr.trigger(ValidationActions.ATTRIBUTE_VALIDATED, attr);
 	                };
 	                attr.hasErrors = function () {
 	                    attr.validation.hasErrors();
@@ -1300,7 +1300,7 @@
 	                var relation = model.relations[rel];
 	                relation.validation = new _Validation2.default().bind(relation);
 	                relation.validated = function () {
-	                    relation.trigger(_ValidationActions2.default.ATTRIBUTE_VALIDATED, relation);
+	                    relation.trigger(ValidationActions.ATTRIBUTE_VALIDATED, relation);
 	                };
 	                relation.hasErrors = function () {
 	                    relation.validation.hasErrors();

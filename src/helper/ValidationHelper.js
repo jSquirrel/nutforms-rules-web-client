@@ -1,7 +1,7 @@
-import ValidationActions from "../constants/ValidationActions";
 import Validation from "../model/Validation";
 import * as FormSubmitted from "../callbacks/FormSubmitted";
 import * as ValidationState from "../constants/ValidationState";
+import * as ValidationActions from "../constants/ValidationActions";
 
 export default class ValidationHelper {
 
