@@ -10,7 +10,7 @@ export default class ValidationHelper {
      *
      * @param {Model} model
      */
-    enhanceModel(model) {
+    static enhanceModel(model) {
         // create validation objects
         model.validation = new Validation().bind(model);
         model.validated = function () {

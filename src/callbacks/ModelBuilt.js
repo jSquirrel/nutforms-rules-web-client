@@ -3,7 +3,7 @@ import RuleAspectsSource from "../aspectsSource/RuleAspectsSource";
 import ContextRules from "../rules/ContextRules";
 import * as ValidationState from "../constants/ValidationState";
 import * as FormSubmitted from "./FormSubmitted";
-import * as ValidationHelper from '../helper/ValidationHelper';
+import ValidationHelper from "../helper/ValidationHelper";
 
 /**
  *

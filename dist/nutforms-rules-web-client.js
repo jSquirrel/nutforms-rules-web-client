@@ -111,7 +111,7 @@
 
 	var _ValidationHelper = __webpack_require__(11);
 
-	var ValidationHelper = _interopRequireWildcard(_ValidationHelper);
+	var _ValidationHelper2 = _interopRequireDefault(_ValidationHelper);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -125,7 +125,7 @@
 	 * @param {Model} model
 	 */
 	function callback(model) {
-	    ValidationHelper.enhanceModel(model);
+	    _ValidationHelper2.default.enhanceModel(model);
 	    var ruleAspectsSource = new _RuleAspectsSource2.default();
 	    var rules = ruleAspectsSource.fetchRules(model.entityName, model.context);
 	    if (rules !== null) {
@@ -1258,7 +1258,7 @@
 	        _classCallCheck(this, ValidationHelper);
 	    }
 
-	    _createClass(ValidationHelper, [{
+	    _createClass(ValidationHelper, null, [{
 	        key: "enhanceModel",
 
 
@@ -1315,7 +1315,7 @@
 	         * @param {Attribute} attribute
 	         */
 
-	    }], [{
+	    }, {
 	        key: "setPending",
 	        value: function setPending(attribute) {
 	            attribute['validation'].state = attribute.hasRules ? ValidationState.PENDING : ValidationState.VALID;
