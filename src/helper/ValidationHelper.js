@@ -1,5 +1,4 @@
 import ValidationActions from "../constants/ValidationActions";
-import AttributeActions from "../../node_modules/nutforms-web-client/src/actions/AttributeActions";
 import Validation from "../model/Validation";
 import * as FormSubmitted from "../callbacks/FormSubmitted";
 import * as ValidationState from "../constants/ValidationState";
