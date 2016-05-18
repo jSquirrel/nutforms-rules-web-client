@@ -80,3 +80,40 @@ The callback for the form submit is executed after the `FORM_SUBMITTED` event is
 * If the model and all its attributes are in a `VALID` state, event `MODEL_VALID` is fired.
 
 ## Using the library
+
+In order to use the library, both the core Nutforms modules ([server](https://github.com/jSquirrel/nutforms-server) and [web-client](https://github.com/jSquirrel/nutforms-web-client)) and the [rule server](https://github.com/jSquirrel/nutforms-rules-server) must be loaded into the application. User guides are part of documentation of these modules. 
+
+Then, both the core and rules client scripts must be loaded into the page:
+
+```javascript
+<script src="../../dist/nutforms.js"></script>
+<script src="../../dist/nutforms-rules-web-client.js"></script>
+```
+
+After the scripts are loaded, configurations of the core part of the library must be done in order to be able to generate the form ([see documentation](https://github.com/jSquirrel/nutforms-web-client/blob/master/docs/en/usage.md)). After that, the form can be automatically generated using the following script (taken from the [nutforms-web-client](https://github.com/jSquirrel/nutforms-web-client) documentation):
+
+```javascript
+// Generate the form
+Nutforms.generateForm(
+    document.getElementById("form"),                // HTML Element
+    "cz.cvut.fel.nutforms.example.model.Bug",       // Entity name
+    "cz_CS",                                        // Locale
+    1,                                              // Entity id
+    "cz.cvut.fel.nutforms.example.model.Bug/new",   // Layout name
+    mappingFunction,                                // Mapping function
+    "new"                                           // Business context
+);
+```
+
+From the business rule perspective, the most important argument are the context and the entity name. These together are used to determine the set of applicable business rules. The [guide to defining aspects](https://github.com/jSquirrel/nutforms-rules-server#rule-aspect-definition) or [example application](https://github.com/jSquirrel/nutforms-example) can be seen for reference.
+
+### Rules related events
+
+This module adds a portion of new events to the system, which can be listened to. Below is a list of these events, including a brief description and a list of parameters these events pass to the callback functions:
+
+* `ATTRIBUTE_VALIDATED` - fired when a validation feedback is received after the evaluation of a validation function on an attribute
+  * `attribute` - reference to the validated  [attribute](https://github.com/jSquirrel/nutforms-web-client/blob/master/src/model/Attribute.js)
+* `MODEL_VALIDATED` - the same as above, but applies for model related rules
+  * `model` - reference to the validated [model](https://github.com/jSquirrel/nutforms-web-client/blob/master/src/model/Model.js)
+* `MODEL_VALID` - fired only if the model and all its attributes are in a `VALID` state
+  * `model` - the [model](https://github.com/jSquirrel/nutforms-web-client/blob/master/src/model/Model.js) of the submitted form
