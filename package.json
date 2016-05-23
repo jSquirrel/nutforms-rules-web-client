@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jSquirrel/nutforms-rules-client.git"
+    "url": "git+https://github.com/jSquirrel/nutforms-rules-web-client.git"
   },
   "author": "Ondřej Kratochvíl <kratoon1@fel.cvut.cz>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jSquirrel/nutforms-rules-client/issues"
+    "url": "https://github.com/jSquirrel/nutforms-rules-web-client/issues"
   },
-  "homepage": "https://github.com/jSquirrel/nutforms-rules-client#readme",
+  "homepage": "https://github.com/jSquirrel/nutforms-rules-web-client#readme",
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-core": "^6.8.0",
