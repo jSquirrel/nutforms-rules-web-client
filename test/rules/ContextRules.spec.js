@@ -22,7 +22,7 @@ describe('ContextRules', function () {
     describe('#validationRules', function () {
         it('should return only validation functions', function () {
             let validationRules = contextRules.validationRules();
-            validationRules.should.be.a('array').with.length(1);
+            validationRules.should.be.an('array').with.length(1);
             assert.equal(validationRules[0], rules[0]);
         });
     });
@@ -30,7 +30,7 @@ describe('ContextRules', function () {
     describe('#securityRules', function () {
         it('should return only security functions', function () {
             let securityRules = contextRules.securityRules();
-            securityRules.should.be.a('array').with.length(1);
+            securityRules.should.be.an('array').with.length(1);
             assert.equal(securityRules[0], rules[1]);
         });
     });

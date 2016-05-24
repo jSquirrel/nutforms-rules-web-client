@@ -1,5 +1,7 @@
 # Nutforms Rules Web Client
 
+https://travis-ci.org/jSquirrel/nutforms-rules-web-client.svg?branch=master
+
 Client side implementation of business rules integration into the Nutforms library.
 
 The Nutforms library consists of following modules:
