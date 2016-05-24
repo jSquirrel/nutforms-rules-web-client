@@ -122,7 +122,7 @@
 	 * Callback for the MODEL_BUILT event that is responsible for invoking aspect weaver and pairing validation functions
 	 * with respective events.
 	 *
-	 * @param {Model} model
+	 * @param {Model} model model on which the event was fired
 	 */
 	function callback(model) {
 	    _ValidationHelper2.default.enhanceModel(model);
@@ -167,6 +167,10 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	/**
+	 * The aspect weaver of rules
+	 */
+
 	var RuleWeaver = function () {
 	    function RuleWeaver() {
 	        _classCallCheck(this, RuleWeaver);
@@ -176,14 +180,12 @@
 	        key: "addObservers",
 
 
-	        // toDo: move some methods to ValidationHelper
-
 	        /**
 	         * Adds validation observers to suitable field events of the model
 	         *
-	         * @param {Model} model
-	         * @param {Array.<object>} rules
-	         * @param {string} locale
+	         * @param {Model} model backing object of the form
+	         * @param {Array.<object>} rules list of rules received from the server
+	         * @param {string} locale current locale from user context
 	         */
 	        value: function addObservers(model, rules, locale) {
 	            var _this = this;
@@ -225,10 +227,10 @@
 	        /**
 	         * Creates a validation function out of given object (rule as JSON)
 	         *
-	         * @param {Model} model
-	         * @param {Array.<Observable>} observables
-	         * @param {object} rule
-	         * @param {string} locale
+	         * @param {Model} model backing object of the form
+	         * @param {Array.<Observable>} observables list of elements, that are bound to the rule
+	         * @param {object} rule rule JSON received from the server
+	         * @param {string} locale current locale from user context
 	         */
 
 	    }, {
@@ -259,7 +261,7 @@
 	         * Evaluates given security rules and disables appropriate fields for violated conditions
 	         *
 	         * @param {Array.<object>} securityRules security rules for current context
-	         * @param {Model} model
+	         * @param {Model} model backing object of the form
 	         */
 
 	    }, {
@@ -282,7 +284,7 @@
 	         * Returns a string with variable declarations to be used in eval(). Creates declarations of all
 	         * attributes of the model. ToDo: add relation support
 	         *
-	         * @param {Model} model
+	         * @param {Model} model backing object of the form
 	         * @returns {string} variable declaration string
 	         */
 
@@ -305,7 +307,7 @@
 	        /**
 	         * Returns field names, to which the function should be bound
 	         *
-	         * @param {string} expression
+	         * @param {string} expression precondition of the rule
 	         * @returns {Array.<string>} field names
 	         */
 
@@ -325,7 +327,7 @@
 	        /**
 	         * Rewrites the raw Drools rule condition to a form where it can be evaluated with JavaScript
 	         *
-	         * @param {string} condition
+	         * @param {string} condition precondition of the rule
 	         * @returns {string} rewritten condition that can be safely passed to <code>eval()</code> JS function
 	         */
 
@@ -359,7 +361,7 @@
 	         * Returns <code>true</code> if the rule with given condition should be treated as a model-related rule, instead
 	         * of being bound to individual fields
 	         *
-	         * @param {string} condition condition of the rule
+	         * @param {string} condition precondition of the rule
 	         * @returns {boolean} true if the rule is model-related
 	         */
 
@@ -465,6 +467,18 @@
 	            }
 	            return indexes;
 	        }
+
+	        /**
+	         * Same as CollectionHelper#findWithAttribute, but searches one level deeper.
+	         *
+	         * @param {Array.<object>} array array of objects
+	         * @param {string} attribute name of object property that is being tested
+	         * @param {string} subattribute name of the nested object property that is being tested
+	         * @param {*} value desired value of given attribute
+	         * @returns {Array.<number>} index of the first object with desired attribute value, or <code>undefined</code> if such
+	         * object is not present in the given array
+	         */
+
 	    }, {
 	        key: "findWithNestedAttribute",
 	        value: function findWithNestedAttribute(array, attribute, subattribute, value) {
@@ -546,9 +560,9 @@
 	    /**
 	     * Fetches rules for given class within given context
 	     *
-	     * @param {string} className
-	     * @param {string} context
-	     * @returns {object}
+	     * @param {string} className name of the class for which the rules shall be fetched
+	     * @param {string} context current business context
+	     * @returns {object} fetched rules
 	     */
 
 
@@ -1026,7 +1040,7 @@
 	     * ContextRules constructor
 	     *
 	     * @param {Array.<object>} contextRules array of JSON objects with server-parsed rule declarations
-	     * @param {string} context
+	     * @param {string} context current business context
 	     */
 
 	    function ContextRules(contextRules, context) {
@@ -1123,8 +1137,8 @@
 	/**
 	 * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for rendering feedback.
 	 *
-	 * @param model
-	 * @param formLabel
+	 * @param {Model} model model on which the event was fired
+	 * @param formLabel html element of the model
 	 */
 	function renderFeedback(model, formLabel) {
 	    var messages = _FeedbackHelper2.default.createErrors(model);
@@ -1144,7 +1158,7 @@
 	/**
 	 * Updates model state on form submit before validation.
 	 *
-	 * @param model
+	 * @param {Model} model model instance
 	 */
 	function setPending(model) {
 	    model['validation'].state = model.hasRules ? ValidationState.PENDING : ValidationState.VALID;
@@ -1159,9 +1173,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	/**
-	 * Created by Ondřej Kratochvíl on 14.5.16.
-	 */
 	var ATTRIBUTE_VALIDATED = exports.ATTRIBUTE_VALIDATED = 'attribute-validated';
 	var MODEL_VALIDATED = exports.MODEL_VALIDATED = 'model-validated';
 	var MODEL_VALID = exports.MODEL_VALID = 'model-valid';
@@ -1265,7 +1276,7 @@
 	        /**
 	         * Adds validation functionality to given model
 	         *
-	         * @param {Model} model
+	         * @param {Model} model instance of the model
 	         */
 	        value: function enhanceModel(model) {
 	            // create validation objects
@@ -1312,7 +1323,7 @@
 	        /**
 	         * VALUE_CHANGED callback to set state to PENDING
 	         *
-	         * @param {Attribute} attribute
+	         * @param {Attribute} attribute instance of the attribute
 	         */
 
 	    }, {
@@ -1365,8 +1376,8 @@
 	    /**
 	     * Binds the Validation trait to Observable entity.
 	     *
-	     * @param {Observable} observable
-	     * @returns {Validation}
+	     * @param {Observable} observable observable object, that is being enriched by validation functionality
+	     * @returns {Validation} this
 	     */
 
 
@@ -1408,7 +1419,7 @@
 	        /**
 	         * Returns <code>true</code> if the value of this attribute is not valid, <code>false</code> if valid
 	         *
-	         * @returns {boolean}
+	         * @returns {boolean} <code>true</code> if the value is valid
 	         */
 	        value: function hasErrors() {
 	            return this.state !== ValidationState.VALID;
@@ -1462,8 +1473,8 @@
 	 * Callback for FORM_RENDERED event. This is used to add callback for individual attributes and model to properly
 	 * render feedback messages.
 	 *
-	 * @param {Model} model
-	 * @param htmlElement
+	 * @param {Model} model model on which the event was fired
+	 * @param htmlElement html element of the model
 	 */
 	function callback(model, htmlElement) {
 	    // render feedback when validation is finished
@@ -1508,8 +1519,8 @@
 	/**
 	 * Callback for event ATTRIBUTE_VALIDATED - renders all errors and info messages for given field
 	 *
-	 * @param {Attribute} attr
-	 * @param htmlElement
+	 * @param {Attribute} attr attribute on which the event was fired
+	 * @param htmlElement html element of the attribute
 	 */
 	function callback(attr, htmlElement) {
 	    var messages = _FeedbackHelper2.default.createErrors(attr);
