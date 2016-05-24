@@ -15,8 +15,8 @@ export default class Validation {
     /**
      * Binds the Validation trait to Observable entity.
      *
-     * @param {Observable} observable
-     * @returns {Validation}
+     * @param {Observable} observable observable object, that is being enriched by validation functionality
+     * @returns {Validation} this
      */
     bind (observable) {
         this.observable = observable;
@@ -57,7 +57,7 @@ export default class Validation {
     /**
      * Returns <code>true</code> if the value of this attribute is not valid, <code>false</code> if valid
      *
-     * @returns {boolean}
+     * @returns {boolean} <code>true</code> if the value is valid
      */
     hasErrors() {
         return this.state !== ValidationState.VALID; 

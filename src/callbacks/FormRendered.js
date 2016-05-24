@@ -6,8 +6,8 @@ import * as FormSubmitted from "./FormSubmitted";
  * Callback for FORM_RENDERED event. This is used to add callback for individual attributes and model to properly
  * render feedback messages.
  *
- * @param {Model} model
- * @param htmlElement
+ * @param {Model} model model on which the event was fired
+ * @param htmlElement html element of the model
  */
 export function callback(model, htmlElement) {
     // render feedback when validation is finished

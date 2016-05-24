@@ -10,7 +10,7 @@ import ValidationHelper from "../helper/ValidationHelper";
  * Callback for the MODEL_BUILT event that is responsible for invoking aspect weaver and pairing validation functions
  * with respective events.
  *
- * @param {Model} model
+ * @param {Model} model model on which the event was fired
  */
 export function callback(model) {
     ValidationHelper.enhanceModel(model);

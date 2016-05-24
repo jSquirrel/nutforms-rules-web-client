@@ -22,6 +22,16 @@ export default class CollectionHelper {
         return indexes;
     }
 
+    /**
+     * Same as CollectionHelper#findWithAttribute, but searches one level deeper.
+     *
+     * @param {Array.<object>} array array of objects
+     * @param {string} attribute name of object property that is being tested
+     * @param {string} subattribute name of the nested object property that is being tested
+     * @param {*} value desired value of given attribute
+     * @returns {Array.<number>} index of the first object with desired attribute value, or <code>undefined</code> if such
+     * object is not present in the given array
+     */
     static findWithNestedAttribute(array, attribute, subattribute, value) {
         let indexes = [];
         for (var i = 0; i < array.length; ++i) {

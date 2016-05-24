@@ -16,8 +16,8 @@ export function callback(model) {
 /**
  * Callback for event FORM_SUBMITTED/MODEL_VALIDATED, which is responsible for rendering feedback.
  *
- * @param model
- * @param formLabel
+ * @param {Model} model model on which the event was fired
+ * @param formLabel html element of the model
  */
 export function renderFeedback(model, formLabel) {
     let messages = FeedbackHelper.createErrors(model);
@@ -38,7 +38,7 @@ export function renderFeedback(model, formLabel) {
 /**
  * Updates model state on form submit before validation.
  *
- * @param model
+ * @param {Model} model model instance
  */
 export function setPending(model) {
     model['validation'].state = model.hasRules ? ValidationState.PENDING : ValidationState.VALID;

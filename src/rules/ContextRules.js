@@ -4,7 +4,7 @@ export default class ContextRules {
      * ContextRules constructor
      *
      * @param {Array.<object>} contextRules array of JSON objects with server-parsed rule declarations
-     * @param {string} context
+     * @param {string} context current business context
      */
     constructor(contextRules, context) {
         this.rules = contextRules;

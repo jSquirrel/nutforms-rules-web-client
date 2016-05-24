@@ -8,7 +8,7 @@ export default class ValidationHelper {
     /**
      * Adds validation functionality to given model
      *
-     * @param {Model} model
+     * @param {Model} model instance of the model
      */
     static enhanceModel(model) {
         // create validation objects
@@ -53,7 +53,7 @@ export default class ValidationHelper {
     /**
      * VALUE_CHANGED callback to set state to PENDING
      *
-     * @param {Attribute} attribute
+     * @param {Attribute} attribute instance of the attribute
      */
     static setPending(attribute) {
         attribute['validation'].state = attribute.hasRules ? ValidationState.PENDING : ValidationState.VALID;

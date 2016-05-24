@@ -3,8 +3,8 @@ import FeedbackHelper from "../helper/FeedbackHelper";
 /**
  * Callback for event ATTRIBUTE_VALIDATED - renders all errors and info messages for given field
  *
- * @param {Attribute} attr
- * @param htmlElement
+ * @param {Attribute} attr attribute on which the event was fired
+ * @param htmlElement html element of the attribute
  */
 export function callback(attr, htmlElement) {
     let messages = FeedbackHelper.createErrors(attr);

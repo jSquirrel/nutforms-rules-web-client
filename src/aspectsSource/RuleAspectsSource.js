@@ -27,9 +27,9 @@ export default class RuleAspectSource {
     /**
      * Fetches rules for given class within given context
      *
-     * @param {string} className
-     * @param {string} context
-     * @returns {object}
+     * @param {string} className name of the class for which the rules shall be fetched
+     * @param {string} context current business context
+     * @returns {object} fetched rules
      */
     fetchRules(className, context) {
         var request = new XMLHttpRequest();
