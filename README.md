@@ -1,6 +1,6 @@
 # Nutforms Rules Web Client
 
-https://travis-ci.org/jSquirrel/nutforms-rules-web-client.svg?branch=master
+[![Build Status](https://travis-ci.org/jSquirrel/nutforms-rules-web-client.svg?branch=master)](https://travis-ci.org/jSquirrel/nutforms-rules-web-client)
 
 Client side implementation of business rules integration into the Nutforms library.
 
